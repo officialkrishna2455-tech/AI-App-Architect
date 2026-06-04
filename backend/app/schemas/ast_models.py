@@ -630,24 +630,32 @@ class ValidationReport(BaseModel):
 class RepairAction(BaseModel):
     """A single repair action taken by the Repair Engine."""
     issue_rule_id: str
-    action_type: str                 # "add", "modify", "remove", "link"
+    action_type: str                 # "add", "modify", "remove", "link", "dedupe"
     target_schema: str
     target_path: str
     description: str
     before_value: Optional[Any] = None
     after_value: Optional[Any] = None
+    changes: list[dict[str, Any]] = Field(default_factory=list)  # Structured change log
 
 
 class RepairReport(BaseModel):
     """Report of all repairs applied."""
+    repair_id: str = Field(default_factory=lambda: str(uuid4()))
     total_repairs: int = 0
     repairs: list[RepairAction] = Field(default_factory=list)
     unresolvable: list[ValidationIssue] = Field(default_factory=list)
+    affected_layers: list[str] = Field(default_factory=list)
+    revalidation_passed: bool = False
+    iterations_used: int = 0
     repair_time_ms: int = 0
 
     @model_validator(mode="after")
     def compute_count(self) -> "RepairReport":
         self.total_repairs = len(self.repairs)
+        # Deduce affected layers from repairs
+        if self.repairs and not self.affected_layers:
+            self.affected_layers = list({r.target_schema for r in self.repairs})
         return self
 
 
