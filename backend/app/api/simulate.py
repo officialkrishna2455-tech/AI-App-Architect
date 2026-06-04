@@ -46,9 +46,61 @@ async def simulate_run(request: SimulateRequest, db: AsyncSession = Depends(get_
     simulator = RuntimeSimulator()
     report = simulator.simulate(ast, spec, request.categories)
     
+    # Self-Healing Loop for standalone simulation endpoint
+    repair_cycles = 0
+    all_repair_actions = []
+    
+    while (
+        report.pass_rate < 1.0 and 
+        repair_cycles < request.max_repair_iterations
+    ):
+        repair_cycles += 1
+        
+        sim_issues = simulator.failures_to_issues(report)
+        if not sim_issues:
+            break
+            
+        from app.schemas.ast_models import ValidationReport
+        from app.compiler.repair_engine import RepairEngine
+        from app.compiler.validation_engine import ValidationEngine
+        
+        sim_validation_report = ValidationReport(issues=sim_issues)
+        repair_engine = RepairEngine()
+        validation_engine = ValidationEngine()
+        
+        spec, sim_repair_report = repair_engine.repair(
+            spec, sim_validation_report, max_iterations=1
+        )
+        
+        if sim_repair_report.repairs:
+            all_repair_actions.extend([
+                {"rule_id": r.issue_rule_id, "action": r.action_type, "target": r.target_path}
+                for r in sim_repair_report.repairs
+            ])
+        
+        _ = validation_engine.validate(
+            spec.ast, spec.ui_schema, spec.api_schema,
+            spec.db_schema, spec.auth_schema, spec.business_logic
+        )
+        
+        report = simulator.simulate(spec.ast, spec, request.categories)
+
+    report.repair_cycles = repair_cycles
+    report.auto_repaired = repair_cycles > 0
+    report.repairs_triggered = all_repair_actions
+    
     # Update DB
     run.simulation_report_json = report.model_dump_json()
     run.simulation_pass_rate = report.pass_rate
+    
+    # If we repaired, we also need to save the new schemas
+    if repair_cycles > 0:
+        run.ui_schema_json = spec.ui_schema.model_dump_json()
+        run.api_schema_json = spec.api_schema.model_dump_json()
+        run.db_schema_json = spec.db_schema.model_dump_json()
+        run.auth_schema_json = spec.auth_schema.model_dump_json()
+        run.business_logic_json = spec.business_logic.model_dump_json()
+
     await db.commit()
     
     return report

@@ -26,6 +26,10 @@ class CompileOptions(BaseModel):
     include_simulation: bool = True
     include_knowledge_graph: bool = True
     max_repair_iterations: int = 3
+    max_simulation_repair_iterations: int = Field(
+        default=2, ge=0, le=5,
+        description="Max self-healing repair cycles when simulation fails (0 = no auto-repair).",
+    )
 
 
 class ValidateRequest(BaseModel):
@@ -43,8 +47,12 @@ class SimulateRequest(BaseModel):
     """POST /simulate — Run simulation on a specific compilation run."""
     run_id: str = Field(..., description="ID of the compilation run to simulate.")
     categories: list[str] = Field(
-        default_factory=lambda: ["crud", "auth", "permission", "navigation", "premium", "analytics"],
+        default_factory=lambda: ["crud", "auth", "authorization", "navigation", "premium", "flow"],
         description="Simulation categories to run.",
+    )
+    max_repair_iterations: int = Field(
+        default=2, ge=0, le=5,
+        description="Max self-healing repair cycles when simulation fails.",
     )
 
 

@@ -663,24 +663,40 @@ class RepairReport(BaseModel):
 # Runtime Simulation Report
 # ═══════════════════════════════════════════════════════════════════
 
+class SimulationTraceStep(BaseModel):
+    """A single step in the simulation execution trace."""
+    layer: str              # "ui", "api", "db", "auth"
+    component: str          # e.g., "/login", "POST /api/v1/auth/login", "users table"
+    action: str             # "route_to", "call_endpoint", "query_table", "check_permission"
+    status: str             # "ok", "fail", "skip"
+    detail: str = ""
+
+
 class SimulationScenario(BaseModel):
     """A single simulation test scenario."""
     scenario_id: str
-    category: str                    # "crud", "auth", "permission", "navigation", "premium", "analytics"
+    category: str                    # "crud", "auth", "authorization", "navigation", "premium", "flow"
     description: str
     steps: list[str] = Field(default_factory=list)
     expected_result: str = "pass"
-    actual_result: str = ""          # "pass" or "fail"
+    actual_result: str = ""          # "pass", "fail", or "skip"
     passed: bool = True
     error_message: str = ""
+    trace: list[SimulationTraceStep] = Field(default_factory=list)
 
 
 class SimulationReport(BaseModel):
     """Complete report of the runtime digital twin simulation."""
+    simulation_status: str = "pending"           # "passed", "failed", "repaired", "pending"
     total_scenarios: int = 0
     passed_count: int = 0
     failed_count: int = 0
+    categories_run: list[str] = Field(default_factory=list)
     scenarios: list[SimulationScenario] = Field(default_factory=list)
+    failures: list[dict[str, Any]] = Field(default_factory=list)            # [{scenario_id, category, error}]
+    repairs_triggered: list[dict[str, Any]] = Field(default_factory=list)   # repair actions taken
+    repair_cycles: int = 0
+    auto_repaired: bool = False
     simulation_time_ms: int = 0
 
     @computed_field
