@@ -1,0 +1,176 @@
+{
+  "$defs": {
+    "PermissionDefinition": {
+      "properties": {
+        "role": {
+          "title": "Role",
+          "type": "string"
+        },
+        "resource": {
+          "title": "Resource",
+          "type": "string"
+        },
+        "actions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Actions",
+          "type": "array"
+        },
+        "conditions": {
+          "title": "Conditions",
+          "type": "object"
+        }
+      },
+      "required": [
+        "role",
+        "resource",
+        "actions"
+      ],
+      "title": "PermissionDefinition",
+      "type": "object"
+    },
+    "PolicyDefinition": {
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "description": {
+          "default": "",
+          "title": "Description",
+          "type": "string"
+        },
+        "effect": {
+          "default": "allow",
+          "title": "Effect",
+          "type": "string"
+        },
+        "roles": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Roles",
+          "type": "array"
+        },
+        "resources": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Resources",
+          "type": "array"
+        },
+        "actions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Actions",
+          "type": "array"
+        },
+        "conditions": {
+          "title": "Conditions",
+          "type": "object"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "PolicyDefinition",
+      "type": "object"
+    },
+    "RoleDefinition": {
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "description": {
+          "default": "",
+          "title": "Description",
+          "type": "string"
+        },
+        "is_default": {
+          "default": false,
+          "title": "Is Default",
+          "type": "boolean"
+        },
+        "parent": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Parent"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "RoleDefinition",
+      "type": "object"
+    },
+    "TokenConfig": {
+      "properties": {
+        "algorithm": {
+          "default": "HS256",
+          "title": "Algorithm",
+          "type": "string"
+        },
+        "expire_minutes": {
+          "default": 1440,
+          "title": "Expire Minutes",
+          "type": "integer"
+        },
+        "refresh_enabled": {
+          "default": true,
+          "title": "Refresh Enabled",
+          "type": "boolean"
+        },
+        "refresh_expire_days": {
+          "default": 7,
+          "title": "Refresh Expire Days",
+          "type": "integer"
+        }
+      },
+      "title": "TokenConfig",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "provider": {
+      "default": "jwt",
+      "title": "Provider",
+      "type": "string"
+    },
+    "roles": {
+      "items": {
+        "$ref": "#/$defs/RoleDefinition"
+      },
+      "title": "Roles",
+      "type": "array"
+    },
+    "permissions": {
+      "items": {
+        "$ref": "#/$defs/PermissionDefinition"
+      },
+      "title": "Permissions",
+      "type": "array"
+    },
+    "policies": {
+      "items": {
+        "$ref": "#/$defs/PolicyDefinition"
+      },
+      "title": "Policies",
+      "type": "array"
+    },
+    "token_config": {
+      "$ref": "#/$defs/TokenConfig"
+    }
+  },
+  "title": "AuthSchema",
+  "type": "object"
+}

@@ -1,0 +1,893 @@
+{
+  "$defs": {
+    "ASTMetadata": {
+      "description": "Metadata about the compilation process.",
+      "properties": {
+        "version": {
+          "default": "1.0.0",
+          "title": "Version",
+          "type": "string"
+        },
+        "source_hash": {
+          "default": "",
+          "title": "Source Hash",
+          "type": "string"
+        },
+        "created_at": {
+          "title": "Created At",
+          "type": "string"
+        },
+        "token_count": {
+          "default": 0,
+          "title": "Token Count",
+          "type": "integer"
+        },
+        "node_count": {
+          "default": 0,
+          "title": "Node Count",
+          "type": "integer"
+        },
+        "warnings": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Warnings",
+          "type": "array"
+        },
+        "enrichments": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Enrichments",
+          "type": "array"
+        }
+      },
+      "title": "ASTMetadata",
+      "type": "object"
+    },
+    "ActionNode": {
+      "description": "An action that can be performed on an entity.",
+      "properties": {
+        "node_type": {
+          "const": "action",
+          "default": "action",
+          "enum": [
+            "action"
+          ],
+          "title": "Node Type",
+          "type": "string"
+        },
+        "verb": {
+          "$ref": "#/$defs/ActionVerb"
+        },
+        "target_entity": {
+          "title": "Target Entity",
+          "type": "string"
+        },
+        "required_roles": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Required Roles",
+          "type": "array"
+        },
+        "required_plan": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Required Plan"
+        },
+        "custom_logic": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Custom Logic"
+        },
+        "source": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SourceLocation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "verb",
+        "target_entity"
+      ],
+      "title": "ActionNode",
+      "type": "object"
+    },
+    "ActionVerb": {
+      "enum": [
+        "create",
+        "read",
+        "update",
+        "delete",
+        "list",
+        "search",
+        "export",
+        "import",
+        "approve",
+        "reject",
+        "assign",
+        "notify"
+      ],
+      "title": "ActionVerb",
+      "type": "string"
+    },
+    "ConstraintNode": {
+      "description": "A constraint applied to a feature or entity.",
+      "properties": {
+        "node_type": {
+          "const": "constraint",
+          "default": "constraint",
+          "enum": [
+            "constraint"
+          ],
+          "title": "Node Type",
+          "type": "string"
+        },
+        "constraint_type": {
+          "$ref": "#/$defs/ConstraintType"
+        },
+        "target": {
+          "title": "Target",
+          "type": "string"
+        },
+        "parameters": {
+          "title": "Parameters",
+          "type": "object"
+        },
+        "description": {
+          "default": "",
+          "title": "Description",
+          "type": "string"
+        },
+        "source": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SourceLocation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "constraint_type",
+        "target"
+      ],
+      "title": "ConstraintNode",
+      "type": "object"
+    },
+    "ConstraintType": {
+      "enum": [
+        "access_control",
+        "payment_gate",
+        "field_validation",
+        "rate_limit",
+        "data_retention",
+        "uniqueness",
+        "required_field",
+        "conditional"
+      ],
+      "title": "ConstraintType",
+      "type": "string"
+    },
+    "EntityNode": {
+      "description": "A data entity \u2014 the core building block of the domain model.",
+      "properties": {
+        "node_type": {
+          "const": "entity",
+          "default": "entity",
+          "enum": [
+            "entity"
+          ],
+          "title": "Node Type",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "fields": {
+          "items": {
+            "$ref": "#/$defs/FieldNode"
+          },
+          "title": "Fields",
+          "type": "array"
+        },
+        "relations": {
+          "items": {
+            "$ref": "#/$defs/RelationNode"
+          },
+          "title": "Relations",
+          "type": "array"
+        },
+        "is_auth_entity": {
+          "default": false,
+          "title": "Is Auth Entity",
+          "type": "boolean"
+        },
+        "soft_delete": {
+          "default": false,
+          "title": "Soft Delete",
+          "type": "boolean"
+        },
+        "timestamps": {
+          "default": true,
+          "title": "Timestamps",
+          "type": "boolean"
+        },
+        "description": {
+          "default": "",
+          "title": "Description",
+          "type": "string"
+        },
+        "source": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SourceLocation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "EntityNode",
+      "type": "object"
+    },
+    "FeatureNode": {
+      "description": "An application feature \u2014 pages, services, workflows.",
+      "properties": {
+        "node_type": {
+          "const": "feature",
+          "default": "feature",
+          "enum": [
+            "feature"
+          ],
+          "title": "Node Type",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "feature_type": {
+          "$ref": "#/$defs/FeatureType"
+        },
+        "entities": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Entities",
+          "type": "array"
+        },
+        "actions": {
+          "items": {
+            "$ref": "#/$defs/ActionNode"
+          },
+          "title": "Actions",
+          "type": "array"
+        },
+        "constraints": {
+          "items": {
+            "$ref": "#/$defs/ConstraintNode"
+          },
+          "title": "Constraints",
+          "type": "array"
+        },
+        "auth_required": {
+          "default": true,
+          "title": "Auth Required",
+          "type": "boolean"
+        },
+        "required_roles": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Required Roles",
+          "type": "array"
+        },
+        "required_plan": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Required Plan"
+        },
+        "sub_features": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Sub Features",
+          "type": "array"
+        },
+        "description": {
+          "default": "",
+          "title": "Description",
+          "type": "string"
+        },
+        "source": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SourceLocation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "name",
+        "feature_type"
+      ],
+      "title": "FeatureNode",
+      "type": "object"
+    },
+    "FeatureType": {
+      "enum": [
+        "page",
+        "service",
+        "integration",
+        "widget",
+        "report",
+        "workflow"
+      ],
+      "title": "FeatureType",
+      "type": "string"
+    },
+    "FieldNode": {
+      "description": "A typed field belonging to an entity.",
+      "properties": {
+        "node_type": {
+          "const": "field",
+          "default": "field",
+          "enum": [
+            "field"
+          ],
+          "title": "Node Type",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "field_type": {
+          "$ref": "#/$defs/FieldType"
+        },
+        "required": {
+          "default": true,
+          "title": "Required",
+          "type": "boolean"
+        },
+        "unique": {
+          "default": false,
+          "title": "Unique",
+          "type": "boolean"
+        },
+        "indexed": {
+          "default": false,
+          "title": "Indexed",
+          "type": "boolean"
+        },
+        "default": {
+          "anyOf": [
+            {},
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Default"
+        },
+        "enum_values": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Enum Values"
+        },
+        "description": {
+          "default": "",
+          "title": "Description",
+          "type": "string"
+        },
+        "source": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SourceLocation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "name",
+        "field_type"
+      ],
+      "title": "FieldNode",
+      "type": "object"
+    },
+    "FieldType": {
+      "enum": [
+        "string",
+        "text",
+        "integer",
+        "float",
+        "boolean",
+        "date",
+        "datetime",
+        "email",
+        "password",
+        "url",
+        "phone",
+        "enum",
+        "json",
+        "uuid",
+        "money",
+        "file",
+        "image"
+      ],
+      "title": "FieldType",
+      "type": "string"
+    },
+    "IntegrationNode": {
+      "description": "An external service integration.",
+      "properties": {
+        "node_type": {
+          "const": "integration",
+          "default": "integration",
+          "enum": [
+            "integration"
+          ],
+          "title": "Node Type",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "integration_type": {
+          "title": "Integration Type",
+          "type": "string"
+        },
+        "provider": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Provider"
+        },
+        "config": {
+          "title": "Config",
+          "type": "object"
+        },
+        "source": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SourceLocation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "name",
+        "integration_type"
+      ],
+      "title": "IntegrationNode",
+      "type": "object"
+    },
+    "PermissionNode": {
+      "description": "A single permission grant on an entity/action pair.",
+      "properties": {
+        "node_type": {
+          "const": "permission",
+          "default": "permission",
+          "enum": [
+            "permission"
+          ],
+          "title": "Node Type",
+          "type": "string"
+        },
+        "resource": {
+          "title": "Resource",
+          "type": "string"
+        },
+        "actions": {
+          "items": {
+            "$ref": "#/$defs/ActionVerb"
+          },
+          "title": "Actions",
+          "type": "array"
+        },
+        "conditions": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Conditions"
+        },
+        "source": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SourceLocation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "resource",
+        "actions"
+      ],
+      "title": "PermissionNode",
+      "type": "object"
+    },
+    "PlanFeatureGate": {
+      "description": "Maps a subscription plan to gated features.",
+      "properties": {
+        "feature": {
+          "title": "Feature",
+          "type": "string"
+        },
+        "limit": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Limit"
+        },
+        "enabled": {
+          "default": true,
+          "title": "Enabled",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "feature"
+      ],
+      "title": "PlanFeatureGate",
+      "type": "object"
+    },
+    "PlanNode": {
+      "description": "A subscription/pricing plan.",
+      "properties": {
+        "node_type": {
+          "const": "plan",
+          "default": "plan",
+          "enum": [
+            "plan"
+          ],
+          "title": "Node Type",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "tier": {
+          "default": 0,
+          "title": "Tier",
+          "type": "integer"
+        },
+        "price": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Price"
+        },
+        "features": {
+          "items": {
+            "$ref": "#/$defs/PlanFeatureGate"
+          },
+          "title": "Features",
+          "type": "array"
+        },
+        "source": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SourceLocation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "PlanNode",
+      "type": "object"
+    },
+    "RelationNode": {
+      "description": "A relationship between two entities.",
+      "properties": {
+        "node_type": {
+          "const": "relation",
+          "default": "relation",
+          "enum": [
+            "relation"
+          ],
+          "title": "Node Type",
+          "type": "string"
+        },
+        "target_entity": {
+          "title": "Target Entity",
+          "type": "string"
+        },
+        "relation_type": {
+          "$ref": "#/$defs/RelationType"
+        },
+        "foreign_key": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Foreign Key"
+        },
+        "cascade_delete": {
+          "default": false,
+          "title": "Cascade Delete",
+          "type": "boolean"
+        },
+        "back_reference": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Back Reference"
+        },
+        "source": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SourceLocation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "target_entity",
+        "relation_type"
+      ],
+      "title": "RelationNode",
+      "type": "object"
+    },
+    "RelationType": {
+      "enum": [
+        "one_to_one",
+        "one_to_many",
+        "many_to_one",
+        "many_to_many"
+      ],
+      "title": "RelationType",
+      "type": "string"
+    },
+    "RoleNode": {
+      "description": "A user role with associated permissions.",
+      "properties": {
+        "node_type": {
+          "const": "role",
+          "default": "role",
+          "enum": [
+            "role"
+          ],
+          "title": "Node Type",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "is_default": {
+          "default": false,
+          "title": "Is Default",
+          "type": "boolean"
+        },
+        "parent_role": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Parent Role"
+        },
+        "permissions": {
+          "items": {
+            "$ref": "#/$defs/PermissionNode"
+          },
+          "title": "Permissions",
+          "type": "array"
+        },
+        "description": {
+          "default": "",
+          "title": "Description",
+          "type": "string"
+        },
+        "source": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SourceLocation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "RoleNode",
+      "type": "object"
+    },
+    "SourceLocation": {
+      "description": "Tracks origin in the source requirement text for error reporting.",
+      "properties": {
+        "line": {
+          "default": 1,
+          "title": "Line",
+          "type": "integer"
+        },
+        "column": {
+          "default": 0,
+          "title": "Column",
+          "type": "integer"
+        },
+        "length": {
+          "default": 0,
+          "title": "Length",
+          "type": "integer"
+        },
+        "raw_text": {
+          "default": "",
+          "title": "Raw Text",
+          "type": "string"
+        }
+      },
+      "title": "SourceLocation",
+      "type": "object"
+    }
+  },
+  "description": "Root of the Requirement AST.\n\nThis is THE canonical data structure consumed by all pipeline stages\nafter the Parser. Raw user text must NEVER be used after this is constructed.",
+  "properties": {
+    "entities": {
+      "items": {
+        "$ref": "#/$defs/EntityNode"
+      },
+      "title": "Entities",
+      "type": "array"
+    },
+    "features": {
+      "items": {
+        "$ref": "#/$defs/FeatureNode"
+      },
+      "title": "Features",
+      "type": "array"
+    },
+    "roles": {
+      "items": {
+        "$ref": "#/$defs/RoleNode"
+      },
+      "title": "Roles",
+      "type": "array"
+    },
+    "plans": {
+      "items": {
+        "$ref": "#/$defs/PlanNode"
+      },
+      "title": "Plans",
+      "type": "array"
+    },
+    "integrations": {
+      "items": {
+        "$ref": "#/$defs/IntegrationNode"
+      },
+      "title": "Integrations",
+      "type": "array"
+    },
+    "constraints": {
+      "items": {
+        "$ref": "#/$defs/ConstraintNode"
+      },
+      "title": "Constraints",
+      "type": "array"
+    },
+    "metadata": {
+      "$ref": "#/$defs/ASTMetadata"
+    }
+  },
+  "title": "RequirementAST",
+  "type": "object"
+}

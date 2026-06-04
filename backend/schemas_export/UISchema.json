@@ -1,0 +1,211 @@
+{
+  "$defs": {
+    "ComponentDefinition": {
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "component_type": {
+          "title": "Component Type",
+          "type": "string"
+        },
+        "entity": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Entity"
+        },
+        "fields": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Fields",
+          "type": "array"
+        },
+        "actions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Actions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "component_type"
+      ],
+      "title": "ComponentDefinition",
+      "type": "object"
+    },
+    "ComponentRef": {
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "props": {
+          "title": "Props",
+          "type": "object"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "ComponentRef",
+      "type": "object"
+    },
+    "NavigationItem": {
+      "properties": {
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "route": {
+          "title": "Route",
+          "type": "string"
+        },
+        "icon": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Icon"
+        },
+        "children": {
+          "items": {
+            "$ref": "#/$defs/NavigationItem"
+          },
+          "title": "Children",
+          "type": "array"
+        },
+        "required_roles": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Required Roles",
+          "type": "array"
+        },
+        "required_plan": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Required Plan"
+        }
+      },
+      "required": [
+        "label",
+        "route"
+      ],
+      "title": "NavigationItem",
+      "type": "object"
+    },
+    "PageDefinition": {
+      "properties": {
+        "route": {
+          "title": "Route",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "layout": {
+          "default": "default",
+          "title": "Layout",
+          "type": "string"
+        },
+        "components": {
+          "items": {
+            "$ref": "#/$defs/ComponentRef"
+          },
+          "title": "Components",
+          "type": "array"
+        },
+        "auth_required": {
+          "default": true,
+          "title": "Auth Required",
+          "type": "boolean"
+        },
+        "required_roles": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Required Roles",
+          "type": "array"
+        },
+        "required_plan": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Required Plan"
+        },
+        "data_sources": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Data Sources",
+          "type": "array"
+        }
+      },
+      "required": [
+        "route",
+        "title"
+      ],
+      "title": "PageDefinition",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "pages": {
+      "items": {
+        "$ref": "#/$defs/PageDefinition"
+      },
+      "title": "Pages",
+      "type": "array"
+    },
+    "components": {
+      "items": {
+        "$ref": "#/$defs/ComponentDefinition"
+      },
+      "title": "Components",
+      "type": "array"
+    },
+    "navigation": {
+      "items": {
+        "$ref": "#/$defs/NavigationItem"
+      },
+      "title": "Navigation",
+      "type": "array"
+    },
+    "theme": {
+      "title": "Theme",
+      "type": "object"
+    }
+  },
+  "title": "UISchema",
+  "type": "object"
+}

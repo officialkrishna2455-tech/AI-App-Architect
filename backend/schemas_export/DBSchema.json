@@ -1,0 +1,232 @@
+{
+  "$defs": {
+    "ColumnDefinition": {
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "data_type": {
+          "title": "Data Type",
+          "type": "string"
+        },
+        "nullable": {
+          "default": false,
+          "title": "Nullable",
+          "type": "boolean"
+        },
+        "primary_key": {
+          "default": false,
+          "title": "Primary Key",
+          "type": "boolean"
+        },
+        "unique": {
+          "default": false,
+          "title": "Unique",
+          "type": "boolean"
+        },
+        "indexed": {
+          "default": false,
+          "title": "Indexed",
+          "type": "boolean"
+        },
+        "default": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Default"
+        },
+        "foreign_key": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Foreign Key"
+        }
+      },
+      "required": [
+        "name",
+        "data_type"
+      ],
+      "title": "ColumnDefinition",
+      "type": "object"
+    },
+    "DBRelation": {
+      "properties": {
+        "from_table": {
+          "title": "From Table",
+          "type": "string"
+        },
+        "from_column": {
+          "title": "From Column",
+          "type": "string"
+        },
+        "to_table": {
+          "title": "To Table",
+          "type": "string"
+        },
+        "to_column": {
+          "title": "To Column",
+          "type": "string"
+        },
+        "on_delete": {
+          "default": "CASCADE",
+          "title": "On Delete",
+          "type": "string"
+        }
+      },
+      "required": [
+        "from_table",
+        "from_column",
+        "to_table",
+        "to_column"
+      ],
+      "title": "DBRelation",
+      "type": "object"
+    },
+    "IndexDefinition": {
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "table": {
+          "title": "Table",
+          "type": "string"
+        },
+        "columns": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Columns",
+          "type": "array"
+        },
+        "unique": {
+          "default": false,
+          "title": "Unique",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "name",
+        "table",
+        "columns"
+      ],
+      "title": "IndexDefinition",
+      "type": "object"
+    },
+    "MigrationStep": {
+      "properties": {
+        "step": {
+          "title": "Step",
+          "type": "integer"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "sql_up": {
+          "title": "Sql Up",
+          "type": "string"
+        },
+        "sql_down": {
+          "title": "Sql Down",
+          "type": "string"
+        }
+      },
+      "required": [
+        "step",
+        "description",
+        "sql_up",
+        "sql_down"
+      ],
+      "title": "MigrationStep",
+      "type": "object"
+    },
+    "TableDefinition": {
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "columns": {
+          "items": {
+            "$ref": "#/$defs/ColumnDefinition"
+          },
+          "title": "Columns",
+          "type": "array"
+        },
+        "primary_key": {
+          "default": "id",
+          "title": "Primary Key",
+          "type": "string"
+        },
+        "unique_constraints": {
+          "items": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "title": "Unique Constraints",
+          "type": "array"
+        },
+        "indexes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Indexes",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "TableDefinition",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "tables": {
+      "items": {
+        "$ref": "#/$defs/TableDefinition"
+      },
+      "title": "Tables",
+      "type": "array"
+    },
+    "indexes": {
+      "items": {
+        "$ref": "#/$defs/IndexDefinition"
+      },
+      "title": "Indexes",
+      "type": "array"
+    },
+    "relations": {
+      "items": {
+        "$ref": "#/$defs/DBRelation"
+      },
+      "title": "Relations",
+      "type": "array"
+    },
+    "migrations": {
+      "items": {
+        "$ref": "#/$defs/MigrationStep"
+      },
+      "title": "Migrations",
+      "type": "array"
+    }
+  },
+  "title": "DBSchema",
+  "type": "object"
+}

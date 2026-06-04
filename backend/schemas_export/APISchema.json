@@ -1,0 +1,178 @@
+{
+  "$defs": {
+    "EndpointDefinition": {
+      "properties": {
+        "method": {
+          "title": "Method",
+          "type": "string"
+        },
+        "path": {
+          "title": "Path",
+          "type": "string"
+        },
+        "summary": {
+          "default": "",
+          "title": "Summary",
+          "type": "string"
+        },
+        "request_body": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Request Body"
+        },
+        "response_body": {
+          "title": "Response Body",
+          "type": "object"
+        },
+        "parameters": {
+          "items": {
+            "$ref": "#/$defs/EndpointParam"
+          },
+          "title": "Parameters",
+          "type": "array"
+        },
+        "auth_required": {
+          "default": true,
+          "title": "Auth Required",
+          "type": "boolean"
+        },
+        "required_roles": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Required Roles",
+          "type": "array"
+        },
+        "required_plan": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Required Plan"
+        },
+        "rate_limit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Rate Limit"
+        },
+        "entity": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Entity"
+        }
+      },
+      "required": [
+        "method",
+        "path"
+      ],
+      "title": "EndpointDefinition",
+      "type": "object"
+    },
+    "EndpointParam": {
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "param_type": {
+          "title": "Param Type",
+          "type": "string"
+        },
+        "data_type": {
+          "title": "Data Type",
+          "type": "string"
+        },
+        "required": {
+          "default": true,
+          "title": "Required",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "name",
+        "param_type",
+        "data_type"
+      ],
+      "title": "EndpointParam",
+      "type": "object"
+    },
+    "MiddlewareDefinition": {
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "middleware_type": {
+          "title": "Middleware Type",
+          "type": "string"
+        },
+        "config": {
+          "title": "Config",
+          "type": "object"
+        }
+      },
+      "required": [
+        "name",
+        "middleware_type"
+      ],
+      "title": "MiddlewareDefinition",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "base_path": {
+      "default": "/api/v1",
+      "title": "Base Path",
+      "type": "string"
+    },
+    "endpoints": {
+      "items": {
+        "$ref": "#/$defs/EndpointDefinition"
+      },
+      "title": "Endpoints",
+      "type": "array"
+    },
+    "middleware": {
+      "items": {
+        "$ref": "#/$defs/MiddlewareDefinition"
+      },
+      "title": "Middleware",
+      "type": "array"
+    },
+    "error_codes": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Error Codes",
+      "type": "object"
+    }
+  },
+  "title": "APISchema",
+  "type": "object"
+}

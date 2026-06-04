@@ -1,0 +1,246 @@
+{
+  "$defs": {
+    "BusinessRule": {
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "entity": {
+          "title": "Entity",
+          "type": "string"
+        },
+        "rule_type": {
+          "title": "Rule Type",
+          "type": "string"
+        },
+        "condition": {
+          "title": "Condition",
+          "type": "string"
+        },
+        "action": {
+          "title": "Action",
+          "type": "string"
+        },
+        "parameters": {
+          "title": "Parameters",
+          "type": "object"
+        }
+      },
+      "required": [
+        "name",
+        "entity",
+        "rule_type",
+        "condition",
+        "action"
+      ],
+      "title": "BusinessRule",
+      "type": "object"
+    },
+    "EventDefinition": {
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "trigger_entity": {
+          "title": "Trigger Entity",
+          "type": "string"
+        },
+        "trigger_action": {
+          "title": "Trigger Action",
+          "type": "string"
+        },
+        "payload_fields": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Payload Fields",
+          "type": "array"
+        },
+        "subscribers": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Subscribers",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "trigger_entity",
+        "trigger_action"
+      ],
+      "title": "EventDefinition",
+      "type": "object"
+    },
+    "IntegrationDefinition": {
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "service_type": {
+          "title": "Service Type",
+          "type": "string"
+        },
+        "provider": {
+          "title": "Provider",
+          "type": "string"
+        },
+        "endpoints": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Endpoints",
+          "type": "array"
+        },
+        "webhooks": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Webhooks",
+          "type": "array"
+        },
+        "config": {
+          "title": "Config",
+          "type": "object"
+        }
+      },
+      "required": [
+        "name",
+        "service_type",
+        "provider"
+      ],
+      "title": "IntegrationDefinition",
+      "type": "object"
+    },
+    "WorkflowDefinition": {
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "trigger": {
+          "title": "Trigger",
+          "type": "string"
+        },
+        "entity": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Entity"
+        },
+        "steps": {
+          "items": {
+            "$ref": "#/$defs/WorkflowStep"
+          },
+          "title": "Steps",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "trigger"
+      ],
+      "title": "WorkflowDefinition",
+      "type": "object"
+    },
+    "WorkflowStep": {
+      "properties": {
+        "step": {
+          "title": "Step",
+          "type": "integer"
+        },
+        "action": {
+          "title": "Action",
+          "type": "string"
+        },
+        "entity": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Entity"
+        },
+        "conditions": {
+          "title": "Conditions",
+          "type": "object"
+        },
+        "on_success": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "On Success"
+        },
+        "on_failure": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "On Failure"
+        }
+      },
+      "required": [
+        "step",
+        "action"
+      ],
+      "title": "WorkflowStep",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "workflows": {
+      "items": {
+        "$ref": "#/$defs/WorkflowDefinition"
+      },
+      "title": "Workflows",
+      "type": "array"
+    },
+    "rules": {
+      "items": {
+        "$ref": "#/$defs/BusinessRule"
+      },
+      "title": "Rules",
+      "type": "array"
+    },
+    "events": {
+      "items": {
+        "$ref": "#/$defs/EventDefinition"
+      },
+      "title": "Events",
+      "type": "array"
+    },
+    "integrations": {
+      "items": {
+        "$ref": "#/$defs/IntegrationDefinition"
+      },
+      "title": "Integrations",
+      "type": "array"
+    }
+  },
+  "title": "BusinessLogicSchema",
+  "type": "object"
+}
