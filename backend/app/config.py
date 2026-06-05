@@ -18,11 +18,14 @@ class Settings(BaseSettings):
     # ── Database ─────────────────────────────────────────────────
     database_url: str = "sqlite+aiosqlite:///./requirement_compiler.db"
 
-    # ── Authentication (single-user mode) ────────────────────────
+    # ── Authentication ─────────────────────────────────────────────
     secret_key: str = "requirement-compiler-secret-change-in-production"
-    access_token_expire_minutes: int = 1440  # 24 hours
-    admin_username: str = "admin"
-    admin_password: str = "compiler2024"
+    jwt_refresh_secret: str = "requirement-compiler-refresh-secret-change-in-production"
+    access_token_expire_minutes: int = 15  # 15 minutes
+    refresh_token_expire_days: int = 7     # 7 days
+    
+    google_client_id: str = ""
+    google_client_secret: str = ""
 
     # ── CORS ─────────────────────────────────────────────────────
     cors_origins: list[str] = ["http://localhost:3000", "http://localhost:3001"]

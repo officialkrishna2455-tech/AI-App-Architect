@@ -14,6 +14,16 @@ class EvaluationMetrics:
         avg_val = sum(r.validation_pass_rate for r in results) / total
         avg_sim = sum(r.simulation_pass_rate for r in results) / total
         avg_repair = sum(r.repair_count for r in results) / total
+        avg_json = sum(r.json_valid_rate for r in results) / total
+        total_assumptions = sum(r.assumptions_made for r in results)
+        
+        # Calculate cost estimate based on token/time proxy (e.g. 0.01 cents per ms for mocked)
+        cost = sum(r.latency_ms * 0.00001 for r in results)
+        
+        failure_cats = {}
+        for r in results:
+            if r.failure_category:
+                failure_cats[r.failure_category] = failure_cats.get(r.failure_category, 0) + 1
         
         latencies = sorted([r.latency_ms for r in results])
         
@@ -24,6 +34,10 @@ class EvaluationMetrics:
             average_validation_pass_rate=avg_val,
             average_simulation_pass_rate=avg_sim,
             average_repair_rate=avg_repair,
+            json_validity_rate=avg_json,
+            assumption_count=total_assumptions,
+            cost_estimate=cost,
+            failure_categories=failure_cats,
             p50_latency_ms=latencies[int(total * 0.5)] if total > 0 else 0,
             p95_latency_ms=latencies[int(total * 0.95)] if total > 0 else 0,
             p99_latency_ms=latencies[int(total * 0.99)] if total > 0 else 0

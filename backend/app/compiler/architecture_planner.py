@@ -28,7 +28,7 @@ class ArchitecturePlanner:
             plan.search_strategy = "elasticsearch"
             
         # Auth Strategy
-        has_auth = any(e.is_auth_entity for e in ast.entities) or any(t.value == "login" for t in (t for node in ast.features for t in node.source_tokens) if hasattr(node, 'source_tokens'))
+        has_auth = any(e.is_auth_entity for e in ast.entities) or any(f.name.lower() == "login" for f in ast.features)
         if has_auth:
             plan.auth_strategy = "jwt"
         else:
@@ -43,7 +43,7 @@ class ArchitecturePlanner:
             plan.file_storage = "s3"
             
         # Realtime
-        has_realtime = any("real-time" in [t.value for t in getattr(c, 'source_tokens', [])] for c in ast.constraints)
+        has_realtime = any("real-time" in getattr(c, 'description', '').lower() for c in ast.constraints)
         if has_realtime:
             plan.realtime_strategy = "websocket"
             

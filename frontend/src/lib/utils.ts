@@ -7,7 +7,9 @@ export function cn(...inputs: ClassValue[]) {
 
 export function formatDate(dateStr: string): string {
   if (!dateStr) return "";
-  const date = new Date(dateStr);
+  // Ensure the date string is parsed as UTC if it lacks a timezone identifier
+  const safeDateStr = dateStr.endsWith("Z") || dateStr.includes("+") ? dateStr : `${dateStr}Z`;
+  const date = new Date(safeDateStr);
   return new Intl.DateTimeFormat("en-US", {
     month: "short",
     day: "numeric",

@@ -1,0 +1,81 @@
+{
+  "status": "completed",
+  "metrics": {
+    "total_latency_ms": 10,
+    "stage_latencies": [
+      {
+        "stage": "lexer",
+        "latency_ms": 0,
+        "status": "completed"
+      },
+      {
+        "stage": "parser",
+        "latency_ms": 1,
+        "status": "completed"
+      },
+      {
+        "stage": "semantic_analyzer",
+        "latency_ms": 0,
+        "status": "completed"
+      },
+      {
+        "stage": "architecture_planner",
+        "latency_ms": 0,
+        "status": "completed"
+      },
+      {
+        "stage": "schema_generator",
+        "latency_ms": 1,
+        "status": "completed"
+      },
+      {
+        "stage": "consistency_engine",
+        "latency_ms": 0,
+        "status": "completed"
+      },
+      {
+        "stage": "validation_engine",
+        "latency_ms": 1,
+        "status": "completed"
+      },
+      {
+        "stage": "repair_engine",
+        "latency_ms": 1,
+        "status": "completed"
+      },
+      {
+        "stage": "runtime_simulator",
+        "latency_ms": 1,
+        "status": "completed"
+      },
+      {
+        "stage": "runtime_simulator_cycle_1",
+        "latency_ms": 1,
+        "status": "completed"
+      },
+      {
+        "stage": "runtime_simulator_cycle_2",
+        "latency_ms": 0,
+        "status": "completed"
+      }
+    ],
+    "token_count": 20,
+    "node_count": 7,
+    "validation_pass_rate": 0.0,
+    "repair_count": 0,
+    "simulation_pass_rate": 0.9393939393939394
+  },
+  "ast_entities": [
+    "user",
+    "contact"
+  ],
+  "ast_features": [
+    "dashboard",
+    "analytics"
+  ],
+  "ast_roles": [
+    "admin"
+  ],
+  "validation_passed": false,
+  "simulation_pass_rate": 0.9393939393939394
+}

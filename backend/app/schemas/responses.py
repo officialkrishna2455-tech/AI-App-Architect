@@ -99,16 +99,30 @@ class MetricsResponse(BaseModel):
     average_repair_rate: float = 0.0
     average_validation_pass_rate: float = 0.0
     average_simulation_pass_rate: float = 0.0
+    json_validity_rate: float = 0.0
+    assumption_count: int = 0
+    cost_estimate: float = 0.0
+    failure_categories: dict[str, int] = Field(default_factory=dict)
     p50_latency_ms: int = 0
     p95_latency_ms: int = 0
     p99_latency_ms: int = 0
 
 
+class UserResponse(BaseModel):
+    """GET /auth/me — Current user profile."""
+    id: str
+    email: str
+    name: Optional[str] = None
+    avatar_url: Optional[str] = None
+    role: str
+    is_active: bool
+
 class TokenResponse(BaseModel):
     """POST /auth/login — JWT token response."""
     access_token: str
+    refresh_token: str
     token_type: str = "bearer"
-    expires_in: int = 1440
+    expires_in: int = 15
 
 
 class ErrorResponse(BaseModel):
@@ -128,6 +142,9 @@ class EvalPromptResult(BaseModel):
     simulation_pass_rate: float = 0.0
     repair_count: int = 0
     latency_ms: int = 0
+    json_valid_rate: float = 1.0
+    assumptions_made: int = 0
+    failure_category: str = ""
     error_message: str = ""
 
 

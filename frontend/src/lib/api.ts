@@ -49,4 +49,10 @@ export class CompilerAPI {
     if (!res.ok) throw new Error("Failed to fetch metrics");
     return res.json();
   }
+
+  static async getEvaluationReport(): Promise<EvalRunResponse> {
+    const res = await fetch(`${API_BASE}/evaluation/report`);
+    if (!res.ok) throw new Error("Failed to fetch evaluation report");
+    return res.json();
+  }
 }

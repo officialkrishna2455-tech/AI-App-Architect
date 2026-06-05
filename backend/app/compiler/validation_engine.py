@@ -348,6 +348,46 @@ class ValidationEngine:
                         affected_path=f"endpoints.[path='{ep.path}'].required_roles",
                     ))
 
+        # V026: Deep Type Validation — AST field types must correctly map to DB column types
+        from app.schemas.ast_models import FieldType
+        EXPECTED_DB_TYPES = {
+            FieldType.STRING: "VARCHAR(255)",
+            FieldType.TEXT: "TEXT",
+            FieldType.INTEGER: "INTEGER",
+            FieldType.FLOAT: "FLOAT",
+            FieldType.BOOLEAN: "BOOLEAN",
+            FieldType.DATE: "DATE",
+            FieldType.DATETIME: "TIMESTAMP",
+            FieldType.EMAIL: "VARCHAR(255)",
+            FieldType.PASSWORD: "VARCHAR(255)",
+            FieldType.URL: "VARCHAR(255)",
+            FieldType.PHONE: "VARCHAR(50)",
+            FieldType.JSON: "JSON",
+            FieldType.UUID: "UUID",
+            FieldType.MONEY: "DECIMAL(10,2)",
+            FieldType.FILE: "VARCHAR(255)",
+            FieldType.IMAGE: "VARCHAR(255)",
+        }
+        
+        for entity in ast.entities:
+            expected_table = f"{entity.name}s".lower()
+            table_def = next((t for t in db.tables if t.name.lower() == expected_table), None)
+            if table_def:
+                for field in entity.fields:
+                    col_def = next((c for c in table_def.columns if c.name == field.name), None)
+                    if col_def:
+                        expected_type = EXPECTED_DB_TYPES.get(field.field_type, "VARCHAR(255)")
+                        if col_def.data_type != expected_type:
+                            issues.append(ValidationIssue(
+                                rule_id="V026",
+                                severity=Severity.ERROR,
+                                layer="cross_layer",
+                                message=f"Deep type mismatch: Entity '{entity.name}' field '{field.name}' of type '{field.field_type}' mapped to '{col_def.data_type}' (expected '{expected_type}')",
+                                affected_schema="db",
+                                affected_path=f"tables.[name='{table_def.name}'].columns.[name='{col_def.name}']",
+                                suggestion=f"Change column '{col_def.name}' data_type to '{expected_type}'"
+                            ))
+
         return issues
 
     # ──────────────────────────────────────────────────────────────
@@ -482,6 +522,57 @@ class ValidationEngine:
                     message=f"Component '{comp.name}' is bound to non-existent entity '{comp.entity}'",
                     affected_schema="ui",
                     affected_path=f"components.[name='{comp.name}']",
+                ))
+
+        # AUTH001: Missing Auth Routes
+        if auth.providers:
+            auth_endpoints = [ep.path for ep in api.endpoints if ep.path.startswith("/api/v1/auth")]
+            if not auth_endpoints:
+                issues.append(ValidationIssue(
+                    rule_id="AUTH001",
+                    severity=Severity.ERROR,
+                    layer="semantic",
+                    message="Auth providers defined but no /api/v1/auth endpoints exist",
+                    affected_schema="api",
+                    affected_path="endpoints"
+                ))
+
+        # AUTH002: Missing JWT Configuration
+        if auth.providers and not auth.jwt_config:
+            issues.append(ValidationIssue(
+                rule_id="AUTH002",
+                severity=Severity.ERROR,
+                layer="semantic",
+                message="Auth providers defined but JWT configuration is missing",
+                affected_schema="auth",
+                affected_path="jwt_config"
+            ))
+
+        # AUTH003: Invalid Role Assignment
+        # Checking if auth routes map to undefined roles
+        auth_role_names = {r.name.lower() for r in auth.roles}
+        for perm in auth.permissions:
+            if perm.role.lower() not in auth_role_names:
+                issues.append(ValidationIssue(
+                    rule_id="AUTH003",
+                    severity=Severity.ERROR,
+                    layer="cross_layer",
+                    message=f"Permission assigned to undefined role '{perm.role}'",
+                    affected_schema="auth",
+                    affected_path="permissions"
+                ))
+
+        # AUTH004: Missing OAuth Provider Configuration
+        if any(p.name == "google" for p in auth.providers):
+            has_google_route = any(ep.path == "/api/v1/auth/google" for ep in api.endpoints)
+            if not has_google_route:
+                issues.append(ValidationIssue(
+                    rule_id="AUTH004",
+                    severity=Severity.ERROR,
+                    layer="semantic",
+                    message="Google OAuth provider defined but /api/v1/auth/google endpoint is missing",
+                    affected_schema="api",
+                    affected_path="endpoints"
                 ))
 
         return issues

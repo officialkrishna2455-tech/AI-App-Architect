@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
+import { AuthProvider } from "@/components/auth/AuthProvider";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
@@ -16,14 +17,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en">
       <body className={`${inter.variable} antialiased min-h-screen flex flex-col relative`}>
-        {/* Background glow effects */}
-        <div className="absolute top-0 inset-x-0 h-64 bg-accent-blue/10 blur-[100px] pointer-events-none -z-10" />
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-accent-cyan/10 blur-[120px] pointer-events-none -z-10" />
+        {/* Technical background pattern (subtle grid or solid) */}
+        <div className="absolute inset-0 bg-slate-50 [mask-image:linear-gradient(to_bottom,white,transparent)] -z-10" />
         
-        <Navbar />
-        <main className="flex-1 flex flex-col">{children}</main>
+        <AuthProvider>
+          <Navbar />
+          <main className="flex-1 flex flex-col">{children}</main>
+        </AuthProvider>
       </body>
     </html>
   );

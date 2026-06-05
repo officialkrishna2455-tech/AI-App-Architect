@@ -1,6 +1,6 @@
 import pytest
 import asyncio
-from httpx import AsyncClient
+from httpx import AsyncClient, ASGITransport
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from fastapi import FastAPI
 import json
@@ -37,7 +37,7 @@ async def setup_db():
 
 @pytest.mark.anyio
 async def test_health_check():
-    async with AsyncClient(app=app, base_url="http://test") as ac:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
         response = await ac.get("/health")
     assert response.status_code == 200
     assert response.json() == {"status": "healthy"}
@@ -69,7 +69,7 @@ async def test_compile_endpoint():
     CompilationPipeline.compile_sync = mock_compile_sync
 
     try:
-        async with AsyncClient(app=app, base_url="http://test") as ac:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
             req_data = {
                 "requirements": "Create a test app",
                 "options": {
@@ -83,10 +83,14 @@ async def test_compile_endpoint():
             assert data["status"] == "queued"
             run_id = data["run_id"]
             
-            # Wait a tiny bit for background task to run
-            await asyncio.sleep(0.1)
+            # Wait up to 2 seconds for background task to run
+            for _ in range(20):
+                res_run = await ac.get(f"/api/v1/runs/{run_id}")
+                if res_run.json()["status"] == "completed":
+                    break
+                await asyncio.sleep(0.1)
             
-            # Fetch the run
+            # Fetch the run one last time to assert
             res_run = await ac.get(f"/api/v1/runs/{run_id}")
             assert res_run.status_code == 200
             assert res_run.json()["status"] == "completed"
@@ -136,7 +140,7 @@ async def test_validate_and_repair_endpoints():
         db.add(run)
         await db.commit()
         
-    async with AsyncClient(app=app, base_url="http://test") as ac:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
         # Validate
         val_res = await ac.post("/api/v1/validate", json={"run_id": run_id})
         assert val_res.status_code == 200
@@ -188,7 +192,7 @@ async def test_simulate_endpoint():
         db.add(run)
         await db.commit()
         
-    async with AsyncClient(app=app, base_url="http://test") as ac:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
         # Simulate
         sim_res = await ac.post("/api/v1/simulate", json={"run_id": run_id})
         assert sim_res.status_code == 200

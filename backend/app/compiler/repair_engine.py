@@ -73,6 +73,7 @@ class RepairEngine:
             auth_issues = [i for i in actionable if i.affected_schema == "auth"]
             bl_issues = [i for i in actionable if i.affected_schema == "business_logic"]
             ast_issues = [i for i in actionable if i.affected_schema == "ast"]
+            graph_issues = [i for i in actionable if i.affected_schema == "graph"]
 
             iter_actions: list[RepairAction] = []
 
@@ -88,6 +89,8 @@ class RepairEngine:
                 iter_actions.extend(self.repair_auth(repaired_spec, auth_issues))
             if bl_issues:
                 iter_actions.extend(self.repair_business_logic(repaired_spec, bl_issues))
+            if graph_issues:
+                iter_actions.extend(self.repair_graph(repaired_spec, graph_issues))
 
             if not iter_actions:
                 # Nothing could be repaired — remaining issues are unresolvable
@@ -618,6 +621,57 @@ class RepairEngine:
                             description=f"Removed event '{event_name}' with non-existent trigger entity",
                             changes=[{"removed_event": event_name}],
                         )
+
+            if action:
+                actions.append(action)
+
+        return actions
+
+    # ──────────────────────────────────────────────────────────────
+    # Layer: Graph (Cross-Layer Consistency)
+    # ──────────────────────────────────────────────────────────────
+
+    def repair_graph(
+        self,
+        spec: CompiledSpecification,
+        issues: list[ValidationIssue],
+    ) -> list[RepairAction]:
+        actions: list[RepairAction] = []
+
+        for issue in issues:
+            action = None
+
+            if issue.rule_id == "G001":
+                # Edge target missing: endpoint:GET:/api/v1/user
+                if "Edge target missing: endpoint:" in issue.message:
+                    # Extract the missing endpoint
+                    endpoint_str = issue.message.split("endpoint:")[1].strip()
+                    if ":" in endpoint_str:
+                        method, path = endpoint_str.split(":", 1)
+                        # Check if it already exists
+                        existing = any(ep.method == method and ep.path == path for ep in spec.api_schema.endpoints)
+                        if not existing:
+                            # Infer an entity name from the path if possible
+                            parts = [p for p in path.split("/") if p and not p.startswith("{")]
+                            inferred_entity = parts[-1].rstrip('s') if parts else "unknown"
+                            
+                            ep = EndpointDefinition(
+                                method=method,
+                                path=path,
+                                summary=f"Auto-generated endpoint {method} {path} to resolve graph dependency",
+                                auth_required=False,
+                                entity=inferred_entity
+                            )
+                            spec.api_schema.endpoints.append(ep)
+                            
+                            action = RepairAction(
+                                issue_rule_id="G001",
+                                action_type="add",
+                                target_schema="api",
+                                target_path="endpoints",
+                                description=f"Injected missing API endpoint {method} {path} to resolve cross-layer graph dependency",
+                                changes=[{"endpoint_added": f"{method} {path}"}]
+                            )
 
             if action:
                 actions.append(action)

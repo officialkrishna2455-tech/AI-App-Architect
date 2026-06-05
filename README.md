@@ -102,18 +102,21 @@ curl -X POST http://localhost:8000/api/compile?sync=true \
   }'
 ```
 
+## Authentication Setup
+
+This platform uses a unified authentication system with standard email/password and Google OAuth.
+To test Google OAuth login, you must configure a Google Cloud project:
+
+1. Go to the [Google Cloud Console](https://console.cloud.google.com/).
+2. Create a new project or select an existing one.
+3. Navigate to **APIs & Services > Credentials**.
+4. Click **Create Credentials** and select **OAuth client ID**.
+5. Set the Application Type to **Web application**.
+6. Add `http://localhost:3000` to the **Authorized JavaScript origins**.
+7. Copy your `Client ID` and `Client Secret`.
+8. Update your local `.env` file with `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`.
+
 ## Docker Deployment
-
-```bash
-# Build and start
-docker-compose up -d
-
-# View logs
-docker-compose logs -f
-
-# Stop
-docker-compose down
-```
 
 ## Cloud Deployment
 

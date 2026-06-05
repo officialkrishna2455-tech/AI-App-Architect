@@ -18,8 +18,8 @@ export default function SchemaViewer({ schemas }: { schemas: SchemaOutput }) {
   ];
 
   return (
-    <div className="glass rounded-xl overflow-hidden border border-white/10 flex flex-col h-[500px]">
-      <div className="flex border-b border-white/10 bg-navy-900/50 overflow-x-auto">
+    <div className="glass rounded-xl overflow-hidden border border-slate-200 flex flex-col h-[500px]">
+      <div className="flex border-b border-slate-200 bg-slate-100 overflow-x-auto">
         {tabs.map(tab => (
           <button
             key={tab.key}
@@ -27,16 +27,16 @@ export default function SchemaViewer({ schemas }: { schemas: SchemaOutput }) {
             className={cn(
               "px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors",
               activeTab === tab.key
-                ? "text-accent-blue border-b-2 border-accent-blue bg-white/5"
-                : "text-slate-400 hover:text-white hover:bg-white/5"
+                ? "text-accent-red border-b-2 border-accent-red bg-white"
+                : "text-slate-500 hover:text-slate-900 hover:bg-white/50"
             )}
           >
             {tab.label}
           </button>
         ))}
       </div>
-      <div className="flex-1 p-4 overflow-auto bg-navy-900/80">
-        <pre className="text-xs text-slate-300 font-mono">
+      <div className="flex-1 p-4 overflow-auto bg-slate-50">
+        <pre className="text-xs text-slate-700 font-mono">
           {JSON.stringify(schemas[activeTab], null, 2)}
         </pre>
       </div>

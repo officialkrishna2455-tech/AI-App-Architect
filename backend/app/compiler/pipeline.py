@@ -31,7 +31,7 @@ class CompilationPipeline:
         self.repair_engine = RepairEngine()
         self.simulator = RuntimeSimulator()
 
-    def compile_sync(self, requirements: str, options: CompileOptions, run_id: str = "sync_run") -> CompileResponse:
+    def compile_sync(self, requirements: str, options: CompileOptions, run_id: str = "sync_run", resume_ast=None) -> CompileResponse:
         start_total = time.time()
         metrics = CompileMetrics()
         
@@ -42,16 +42,22 @@ class CompilationPipeline:
             metrics.stage_latencies.append(StageLatency(stage=stage_name, latency_ms=latency))
             return result
 
-        # 1. Lexer
-        tokens = track_time("lexer", self.lexer.tokenize, requirements)
-        metrics.token_count = len(tokens)
-        
-        # 2. Parser
-        ast = track_time("parser", self.parser.parse, tokens, requirements)
-        metrics.node_count = ast.total_nodes
-        
-        # 3. Semantic Analyzer
-        enriched_ast = track_time("semantic_analyzer", self.semantic_analyzer.analyze, ast)
+        if resume_ast is not None:
+            ast = resume_ast
+            metrics.node_count = ast.total_nodes
+            metrics.token_count = 0
+            enriched_ast = track_time("semantic_analyzer", self.semantic_analyzer.analyze, ast)
+        else:
+            # 1. Lexer
+            tokens = track_time("lexer", self.lexer.tokenize, requirements)
+            metrics.token_count = len(tokens)
+            
+            # 2. Parser
+            ast = track_time("parser", self.parser.parse, tokens, requirements)
+            metrics.node_count = ast.total_nodes
+            
+            # 3. Semantic Analyzer
+            enriched_ast = track_time("semantic_analyzer", self.semantic_analyzer.analyze, ast)
         
         # 4. Architecture Planner
         arch_plan = track_time("architecture_planner", self.arch_planner.plan, enriched_ast)

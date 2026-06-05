@@ -18,30 +18,34 @@ export default function RunsPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
-      <h1 className="text-3xl font-bold mb-6">Compilation Runs</h1>
+      <div className="mb-6 border-b border-slate-200 pb-4">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
+          Compilation Runs
+        </h1>
+      </div>
       
-      {loading && <div className="text-accent-blue animate-pulse">Loading runs...</div>}
+      {loading && <div className="text-slate-500 animate-pulse text-sm font-medium">Loading runs...</div>}
       
       {!loading && data && (
-        <div className="glass rounded-xl border border-white/10 overflow-hidden">
+        <div className="bg-white rounded-md border border-slate-200 overflow-hidden shadow-sm">
           <table className="w-full text-left text-sm">
-            <thead className="bg-navy-900/80 border-b border-white/10 text-slate-400">
+            <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold text-xs uppercase tracking-wider">
               <tr>
-                <th className="p-4">Time</th>
-                <th className="p-4">Requirements</th>
-                <th className="p-4">Status</th>
-                <th className="p-4">Latency</th>
-                <th className="p-4">Validation</th>
-                <th className="p-4">Entities</th>
+                <th className="p-4 font-semibold">Time</th>
+                <th className="p-4 font-semibold">Requirements</th>
+                <th className="p-4 font-semibold">Status</th>
+                <th className="p-4 font-semibold">Latency</th>
+                <th className="p-4 font-semibold">Validation</th>
+                <th className="p-4 font-semibold">Entities</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-slate-100 text-slate-700">
               {data.runs.map(run => (
-                <tr key={run.run_id} className="hover:bg-white/5 transition-colors">
-                  <td className="p-4 whitespace-nowrap">{formatDate(run.created_at)}</td>
-                  <td className="p-4 max-w-xs truncate">{run.requirements_preview}</td>
+                <tr key={run.run_id} className="hover:bg-slate-50 transition-colors">
+                  <td className="p-4 whitespace-nowrap text-slate-500 text-xs font-mono">{formatDate(run.created_at)}</td>
+                  <td className="p-4 max-w-xs truncate font-medium text-slate-800">{run.requirements_preview}</td>
                   <td className="p-4">
-                    <span className="px-2 py-1 bg-success/20 text-success rounded text-xs font-medium">
+                    <span className={`px-2 py-1 rounded text-xs font-bold border ${run.status === 'COMPLETED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-700 border-slate-200'}`}>
                       {run.status}
                     </span>
                   </td>

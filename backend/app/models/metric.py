@@ -23,5 +23,8 @@ class EvaluationResult(Base):
     simulation_pass_rate = Column(Float, default=0.0)
     repair_count = Column(Integer, default=0)
     latency_ms = Column(Integer, default=0)
+    json_valid_rate = Column(Float, default=1.0)
+    assumptions_made = Column(Integer, default=0)
+    failure_category = Column(String, nullable=True)
     error_message = Column(Text, nullable=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))

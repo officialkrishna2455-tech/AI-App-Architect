@@ -352,6 +352,88 @@ class RuntimeSimulator:
             )
         )
 
+        # 1g. Google Login Flow
+        google_ep = any(ep.path == "/api/v1/auth/google" for ep in spec.api_schema.endpoints)
+        scenarios.append(
+            self._scenario(
+                "auth_google_login",
+                "auth",
+                "Simulate Google Login flow",
+                ["Navigate to /login", "Submit Google ID token", "Generate JWT"],
+                google_ep,
+                "" if google_ep else "Missing Google OAuth endpoint",
+                [
+                    SimulationTraceStep(layer="api", component="POST /api/v1/auth/google", action="verify_endpoint", status="ok" if google_ep else "fail", detail="Google auth endpoint")
+                ]
+            )
+        )
+
+        # 1h. Token Refresh Flow
+        refresh_ep = any(ep.path == "/api/v1/auth/refresh" for ep in spec.api_schema.endpoints)
+        scenarios.append(
+            self._scenario(
+                "auth_token_refresh",
+                "auth",
+                "Simulate Token Refresh flow",
+                ["Submit refresh token", "Validate token", "Generate new access token"],
+                refresh_ep,
+                "" if refresh_ep else "Missing Token Refresh endpoint",
+                [
+                    SimulationTraceStep(layer="api", component="POST /api/v1/auth/refresh", action="verify_endpoint", status="ok" if refresh_ep else "fail", detail="Refresh endpoint")
+                ]
+            )
+        )
+
+        # 1i. Logout Flow
+        logout_ep = any(ep.path == "/api/v1/auth/logout" for ep in spec.api_schema.endpoints)
+        scenarios.append(
+            self._scenario(
+                "auth_logout_flow",
+                "auth",
+                "Simulate Logout flow",
+                ["Call logout endpoint", "Invalidate session"],
+                logout_ep,
+                "" if logout_ep else "Missing Logout endpoint",
+                [
+                    SimulationTraceStep(layer="api", component="POST /api/v1/auth/logout", action="verify_endpoint", status="ok" if logout_ep else "fail", detail="Logout endpoint")
+                ]
+            )
+        )
+
+        # 1j. Role Assignment
+        # Check if auth roles exist and default role is assigned
+        roles_defined = len(spec.auth_schema.roles) > 0
+        scenarios.append(
+            self._scenario(
+                "auth_role_assignment",
+                "auth",
+                "Simulate Role Assignment on Registration",
+                ["Register new user", "Assign default role"],
+                roles_defined,
+                "" if roles_defined else "No roles defined in auth schema",
+                [
+                    SimulationTraceStep(layer="auth", component="roles", action="verify_assignment", status="ok" if roles_defined else "fail", detail="Roles configuration exists")
+                ]
+            )
+        )
+
+        # 1k. Protected Route Access
+        protected_routes = [ep for ep in spec.api_schema.endpoints if ep.required_roles]
+        has_protected = len(protected_routes) > 0
+        scenarios.append(
+            self._scenario(
+                "auth_protected_route_access",
+                "auth",
+                "Simulate Protected Route Access",
+                ["Access protected endpoint without token (Fail)", "Access with valid token (Success)"],
+                has_protected,
+                "" if has_protected else "No protected routes configured to test",
+                [
+                    SimulationTraceStep(layer="api", component="protected_routes", action="verify_guards", status="ok" if has_protected else "fail", detail=f"{len(protected_routes)} protected routes found")
+                ]
+            )
+        )
+
         return scenarios
 
     # ──────────────────────────────────────────────────────────────

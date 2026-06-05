@@ -12,6 +12,7 @@ from app.api.simulate import router as simulate_router
 from app.api.runs import router as runs_router
 from app.api.metrics import router as metrics_router
 from app.api.auth import router as auth_router
+from app.api.evaluation import router as evaluation_router
 
 settings = get_settings()
 
@@ -46,6 +47,7 @@ app.include_router(simulate_router, prefix="/api/v1")
 app.include_router(runs_router, prefix="/api/v1")
 app.include_router(metrics_router, prefix="/api/v1")
 app.include_router(auth_router, prefix="/api/v1")
+app.include_router(evaluation_router, prefix="/api/v1")
 
 @app.get("/")
 async def root():

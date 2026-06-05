@@ -1,12 +1,10 @@
 @import "tailwindcss";
 
 @theme {
-  --color-navy-900: #0a0f1c;
-  --color-navy-800: #111827;
-  --color-navy-700: #1a2332;
-  --color-accent-blue: #3b82f6;
-  --color-accent-cyan: #06b6d4;
-  --color-accent-emerald: #10b981;
+  --color-accent-red: #DC2626;
+  --color-accent-red-hover: #B91C1C;
+  --color-accent-blue: #3b82f6; /* Keep for minor accents if needed */
+  --color-accent-cyan: #06b6d4; /* Keep for minor accents if needed */
   
   --color-success: #10b981;
   --color-warning: #f59e0b;
@@ -17,21 +15,21 @@
 
 @layer base {
   body {
-    @apply bg-navy-900 text-slate-100 font-sans selection:bg-accent-blue selection:text-white;
+    @apply bg-white text-slate-900 font-sans selection:bg-accent-red selection:text-white;
   }
 }
 
 @layer utilities {
   .glass {
-    @apply bg-navy-800/80 backdrop-blur-md border border-white/10;
+    @apply bg-white border border-slate-200 shadow-sm rounded-md;
   }
   
   .glass-dark {
-    @apply bg-navy-900/80 backdrop-blur-lg border border-white/5;
+    @apply bg-slate-50 border-b border-slate-200;
   }
   
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-accent-cyan to-accent-blue;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-accent-red to-accent-red-hover;
   }
 
   /* Custom Scrollbar */
@@ -43,9 +41,9 @@
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    @apply bg-slate-700 rounded-full;
+    @apply bg-slate-300 rounded-full;
   }
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-slate-600;
+    @apply bg-slate-400;
   }
 }

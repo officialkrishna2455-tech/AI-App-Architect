@@ -18,6 +18,7 @@ class CompileRequest(BaseModel):
         examples=["Build a CRM with login, contacts, dashboard, role-based access, premium plans, payments, and analytics."],
     )
     options: CompileOptions = Field(default_factory=lambda: CompileOptions())
+    resume_from_run_id: Optional[str] = Field(None, description="ID of a previous run to resume from")
 
 
 class CompileOptions(BaseModel):
@@ -66,10 +67,23 @@ class RunListParams(BaseModel):
 
 
 class LoginRequest(BaseModel):
-    """POST /auth/login — Single-user authentication."""
-    username: str
+    """POST /auth/login — Standard email/password login."""
+    email: str
     password: str
 
+class UserCreate(BaseModel):
+    """POST /auth/register — Create a new user."""
+    email: str
+    password: str
+    name: Optional[str] = None
+
+class GoogleAuthRequest(BaseModel):
+    """POST /auth/google — Authenticate via Google ID token."""
+    id_token: str
+
+class TokenRefreshRequest(BaseModel):
+    """POST /auth/refresh — Refresh access token."""
+    refresh_token: str
 
 class EvalRunRequest(BaseModel):
     """POST /evaluate — Run the evaluation framework."""
