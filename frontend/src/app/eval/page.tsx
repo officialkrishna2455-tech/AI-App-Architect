@@ -84,7 +84,7 @@ export default function EvalPage() {
             <div className="text-slate-500 py-4 text-sm">No failures recorded.</div>
           ) : (
             <ul className="space-y-2">
-              {Object.entries(metrics.failure_categories).map(([cat, count]) => (
+              {Object.entries(metrics.failure_categories || {}).map(([cat, count]) => (
                 <li key={cat} className="flex justify-between items-center bg-slate-50 p-2.5 rounded border border-slate-100">
                   <span className="text-slate-700 text-sm font-medium">{cat}</span>
                   <span className="bg-red-100 text-red-600 px-2 py-0.5 rounded text-xs font-bold border border-red-200">{count}</span>
