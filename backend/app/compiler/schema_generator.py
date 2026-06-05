@@ -66,7 +66,7 @@ class SchemaGenerator:
                 auth_required=True,
                 required_roles=feature.required_roles,
                 required_plan=feature.required_plan,
-                data_sources=[f"/api/v1/{e}" for e in feature.entities]
+                data_sources=[f"/api/v1/{e}s" for e in feature.entities]
             ))
             nav_items.append(NavigationItem(
                 label=feature.name.capitalize(),
@@ -117,8 +117,11 @@ class SchemaGenerator:
         if plan.auth_strategy == "jwt":
             api.middleware.append(MiddlewareDefinition(name="jwt_auth", middleware_type="auth"))
             api.endpoints.extend([
-                EndpointDefinition(method="POST", path="/api/v1/auth/login", auth_required=False, response_body={"token": "string"}),
-                EndpointDefinition(method="POST", path="/api/v1/auth/register", auth_required=False, response_body={"token": "string"})
+                EndpointDefinition(method="POST", path="/api/v1/auth/login",    auth_required=False, response_body={"token": "string"}),
+                EndpointDefinition(method="POST", path="/api/v1/auth/register", auth_required=False, response_body={"token": "string"}),
+                EndpointDefinition(method="POST", path="/api/v1/auth/logout",   auth_required=True,  response_body={"message": "string"}),
+                EndpointDefinition(method="POST", path="/api/v1/auth/refresh",  auth_required=False, response_body={"token": "string"}),
+                EndpointDefinition(method="POST", path="/api/v1/auth/google",   auth_required=False, response_body={"token": "string"}),
             ])
             
         for entity in ast.entities:

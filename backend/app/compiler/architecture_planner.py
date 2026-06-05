@@ -27,8 +27,24 @@ class ArchitecturePlanner:
             plan.caching_strategy = "redis"
             plan.search_strategy = "elasticsearch"
             
-        # Auth Strategy
-        has_auth = any(e.is_auth_entity for e in ast.entities) or any(f.name.lower() == "login" for f in ast.features)
+        # Auth Strategy — broad detection to avoid missing implicit auth
+        _AUTH_ENTITY_NAMES = {
+            "user", "users", "account", "accounts", "member", "members",
+            "customer", "customers", "employee", "employees", "staff",
+            "admin", "admins", "person", "persons", "people", "patient",
+            "patients", "doctor", "doctors", "client", "clients",
+            "subscriber", "subscribers", "profile", "profiles",
+        }
+        _AUTH_FEATURE_KEYWORDS = {
+            "login", "auth", "authentication", "signup", "register",
+            "signin", "logout", "session", "password", "credential",
+        }
+        has_auth = (
+            any(e.is_auth_entity for e in ast.entities)
+            or any(e.name.lower() in _AUTH_ENTITY_NAMES for e in ast.entities)
+            or any(f.name.lower() in _AUTH_FEATURE_KEYWORDS for f in ast.features)
+            or bool(ast.roles)  # any role definitions imply auth is needed
+        )
         if has_auth:
             plan.auth_strategy = "jwt"
         else:
