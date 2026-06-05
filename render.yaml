@@ -1,0 +1,39 @@
+services:
+  # ── Backend: FastAPI ──────────────────────────────────────────
+  - type: web
+    name: ai-app-architect-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        value: sqlite+aiosqlite:///./data/requirement_compiler.db
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ADMIN_USERNAME
+        value: admin
+      - key: ADMIN_PASSWORD
+        generateValue: true
+      - key: DEBUG
+        value: "false"
+      - key: SPACY_MODEL
+        value: en_core_web_sm
+      - key: CORS_ORIGINS
+        value: '["https://ai-app-architect-frontend.onrender.com"]'
+    disk:
+      name: backend-data
+      mountPath: /app/data
+      sizeGB: 1
+
+  # ── Frontend: Next.js ─────────────────────────────────────────
+  - type: web
+    name: ai-app-architect-frontend
+    runtime: docker
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    plan: free
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        value: https://ai-app-architect-backend.onrender.com
