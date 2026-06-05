@@ -21,7 +21,7 @@ services:
       - key: SPACY_MODEL
         value: en_core_web_sm
       - key: CORS_ORIGINS
-        value: '["https://ai-app-architect-frontend.onrender.com"]'
+        value: '["https://frontend-krishna2455.vercel.app","https://frontend-ioisx627h-krishna2455.vercel.app"]'
     disk:
       name: backend-data
       mountPath: /app/data
