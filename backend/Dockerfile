@@ -17,8 +17,11 @@ RUN python -m spacy download en_core_web_sm || true
 # Copy application code
 COPY . .
 
+# Ensure data directory exists for SQLite persistence
+RUN mkdir -p /app/data
+
 # Expose port
 EXPOSE 8000
 
-# Run with uvicorn
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "2"]
+# Single worker to fit within Render free-tier 512MB RAM
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
