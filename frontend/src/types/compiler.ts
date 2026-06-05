@@ -259,6 +259,7 @@ export interface MetricsResponse {
   p50_latency_ms: number;
   p95_latency_ms: number;
   p99_latency_ms: number;
+  failure_categories?: Record<string, number>;
 }
 
 export interface EvalPromptResult {
