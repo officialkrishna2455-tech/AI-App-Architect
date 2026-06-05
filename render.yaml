@@ -9,7 +9,7 @@ services:
     healthCheckPath: /health
     envVars:
       - key: DATABASE_URL
-        value: sqlite+aiosqlite:///./data/requirement_compiler.db
+        value: sqlite+aiosqlite:////tmp/requirement_compiler.db
       - key: SECRET_KEY
         generateValue: true
       - key: ADMIN_USERNAME
@@ -22,18 +22,3 @@ services:
         value: en_core_web_sm
       - key: CORS_ORIGINS
         value: '["https://frontend-krishna2455.vercel.app","https://frontend-ioisx627h-krishna2455.vercel.app"]'
-    disk:
-      name: backend-data
-      mountPath: /app/data
-      sizeGB: 1
-
-  # ── Frontend: Next.js ─────────────────────────────────────────
-  - type: web
-    name: ai-app-architect-frontend
-    runtime: docker
-    dockerfilePath: ./frontend/Dockerfile
-    dockerContext: ./frontend
-    plan: free
-    envVars:
-      - key: NEXT_PUBLIC_API_URL
-        value: https://ai-app-architect-backend.onrender.com
